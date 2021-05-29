@@ -26,11 +26,17 @@ class MovieViewModel(private val mainRepository: MainRepository) : ViewModel() {
         moviePage.value = (--_moviePage).toString()
     }
 
-    fun getMoviesForPage() = liveData(IO) {
-        var response = mainRepository.getCurrentMovie(moviePage.value!!)
-        if (response.isSuccessful) {
-            emit(response.body())
-        }
+//    fun getMoviesForPage() = liveData(IO) {
+//        var response = mainRepository.getCurrentMovie(moviePage.value!!)
+//        if (response.isSuccessful) {
+//            emit(response.body())
+//        }
+//    }
+
+    var liveData = MutableLiveData<NowPlayingResponse>()
+
+    fun fetchData() {
+        liveData = mainRepository.fetchNowPlaying(moviePage.value!!)
     }
 
     fun getPopularMovieForPage() = liveData(IO) {

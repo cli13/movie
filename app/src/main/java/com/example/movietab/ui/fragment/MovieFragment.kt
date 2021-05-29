@@ -1,6 +1,5 @@
 package com.example.movietab.ui.fragment
 
-import android.graphics.Movie
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -24,7 +23,6 @@ class MovieFragment : Fragment() {
         fun newInstance(position: Int): MovieFragment {
             val bundle = Bundle()
             bundle.putInt(KEY_ITEM_NUMBER, position)
-
             val fragment = MovieFragment()
             fragment.arguments = bundle
             return fragment
@@ -35,7 +33,6 @@ class MovieFragment : Fragment() {
     private var _binding: MovieFragmentBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var factory: MovieViewModelFactory
     private lateinit var viewModel: MovieViewModel
     private lateinit var adapter: MovieAdapter
 
@@ -48,10 +45,8 @@ class MovieFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        //_binding = DataBindingUtil.inflate(inflater, R.layout.movie_fragment, container, false)
         _binding = MovieFragmentBinding.inflate(layoutInflater)
-        factory = MovieViewModelFactory(MainRepository(MovieApi()))
-        //factory = (activity?.application as MovieApp).appComponent.injectMovieFactoryViewModel(this)
+        var factory = (activity?.application as MovieApp).appComponent.getMovieFactoryViewModel()
         viewModel = ViewModelProvider(viewModelStore, factory).get(MovieViewModel::class.java)
         adapter = MovieAdapter(emptyList())
         setUpAdapter()
@@ -70,7 +65,7 @@ class MovieFragment : Fragment() {
         }
     }
 
-    private var maxPage = 10;
+    private var maxPage = 10
 
     private fun setupObservers() {
         viewModel.moviePage.observe(viewLifecycleOwner) {
@@ -84,11 +79,17 @@ class MovieFragment : Fragment() {
     private fun updateList() {
         when (itemNumber) {
             0 -> {
-                viewModel.getMoviesForPage().observe(viewLifecycleOwner, {
-                    adapter.list = it!!.results
+//                viewModel.getMoviesForPage().observe(viewLifecycleOwner, {
+//                    adapter.list = it!!.results
+//                    adapter.notifyDataSetChanged()
+//                    maxPage = it.total_pages
+//                })
+                viewModel.fetchData()
+                viewModel.liveData.observe(viewLifecycleOwner) {
+                    adapter.list = it.results
                     adapter.notifyDataSetChanged()
                     maxPage = it.total_pages
-                })
+                }
             }
             1 -> {
                 viewModel.getPopularMovieForPage().observe(viewLifecycleOwner) {

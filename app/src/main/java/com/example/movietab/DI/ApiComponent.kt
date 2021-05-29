@@ -9,5 +9,5 @@ import javax.inject.Singleton
 @Singleton
 interface ApiComponent {
     fun injectMovieFactoryViewModel(fragment: MovieFragment)
-
+    fun getMovieFactoryViewModel(): MovieViewModelFactory
 }
